@@ -59,6 +59,7 @@ module Rhino
       ContextFactory.new.call do |native|
         @native = native
         @global = NativeObject.new(@native.initStandardObjects(nil, options[:sealed] == true))
+        @global["load"] = lambda {|filepath| load(filepath) }
         if with = options[:with]
           @scope = To.javascript(with)
           @scope.setParentScope(@global.j)
