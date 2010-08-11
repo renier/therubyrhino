@@ -59,7 +59,17 @@ module Rhino
       ContextFactory.new.call do |native|
         @native = native
         @global = NativeObject.new(@native.initStandardObjects(nil, options[:sealed] == true))
+        # FIXME: There must be a better way to load the usual global functions
+        # but I don't know what it is.
         @global["load"] = lambda {|filepath| load(filepath) }
+        @global["print"] = lambda {|str| puts(str) }
+        @global["parseInt"] = lambda do |obj|
+          case obj
+          when Array then obj[0].to_i
+          else obj.to_i
+          end
+        end
+
         if with = options[:with]
           @scope = To.javascript(with)
           @scope.setParentScope(@global.j)
